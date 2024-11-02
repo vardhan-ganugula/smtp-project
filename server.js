@@ -1,41 +1,36 @@
-const { SMTPServer } = require('smtp-server');
-const { MailParser } = require('mailparser');
+const SMTPServer = require('smtp-server').SMTPServer
+const {simpleParser} = require('mailparser');
 
 const server = new SMTPServer({
-    authOptional: true,
+    authOptional : true,
     allowInsecureAuth: true,
-    onConnect(session, cb) {
-        console.log(`Client connected: ${session.id}`);
-        cb();
+    onConnect(session, cb){
+        console.log(session.id)
+        cb()
     },
-    onMailFrom(address, session, cb) {
-        console.log(`Mail from: ${address.address}`);
-        cb();
+    onMailFrom(address, session, cb){
+        cb()
     },
-    onRcptTo(address, session, cb) {
-        console.log(`Recipient to: ${address.address}`);
-        cb();
+    onRcptTo(address, session, cb){
+        cb()
     },
     onData(stream, session, cb) {
-        const parser = new MailParser();
-
-        // Handle parsed email data
-        parser.on('end', (mail) => {
+        simpleParser(stream, (err, mail) => {
+            if (err) {
+                console.error('Error parsing email:', err);
+                return cb(err);
+            }
             console.log('Parsed email:', mail);
-        });
-
-        // Pipe incoming email data to the MailParser
-        stream.pipe(parser);
-
-        // Call the callback to indicate that the email has been processed
-        stream.on('end', () => {
-            console.log('Email processing complete');
             cb();
         });
-    }
-});
 
-// Start the SMTP server
-server.listen(25, () => {
-    console.log('Server is listening at port 25');
-});
+        stream.on('end', () => {
+            console.log('Email processing complete');
+        });
+    }
+})
+
+
+server.listen(25, (res)=>{
+    console.log('server is listening at port 25')
+})
