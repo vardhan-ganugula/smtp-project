@@ -20,7 +20,7 @@ const server = new SMTPServer({
                 console.error('Error parsing email:', err);
                 return cb(err);
             }
-            console.log('Parsed email:', mail);
+            console.log('Parsed email:', mail.html);
             cb();
         });
 
