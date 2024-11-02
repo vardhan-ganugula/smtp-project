@@ -1,6 +1,5 @@
 const SMTPServer = require('smtp-server').SMTPServer
-const mailParser = require('mailparser').simpleParser
-
+const mailParser = require('mailparser').MailParser
 const server = new SMTPServer({
     authOptional : true,
     allowInsecureAuth: true,
@@ -15,9 +14,9 @@ const server = new SMTPServer({
         cb()
     },
     onData(stream,session,cb){
-        stream.on('data', (data)=> {
-            mailParser.then(result => console.log(result))
-        })
+        const parser = new mailParser();
+        parser.on(data => console.log(data))
+        stream.pipe(parser)
         stream.on('end', cb)
     }
 })
