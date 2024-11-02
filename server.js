@@ -15,7 +15,7 @@ const server = new SMTPServer({
     },
     onData(stream,session,cb){
         const parser = new mailParser();
-        parser.on(data => console.log(data))
+        parser.on('end' , data => {console.log(data)})
         stream.pipe(parser)
         stream.on('end', cb)
     }
